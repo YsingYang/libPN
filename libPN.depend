@@ -1,0 +1,28 @@
+# depslib dependency file v1.0
+1496840395 source:/home/ysing/codeblock Projects/libPN/PNEventLoop.cpp
+	"PNEventLoop.h"
+	<assert.h>
+	<sys/poll.h>
+
+1496838625 /home/ysing/codeblock Projects/libPN/PNEventLoop.h
+	<boost/noncopyable.hpp>
+	<thread>
+	<atomic>
+	<mutex>
+	"PNtype.h"
+
+1496754472 /home/ysing/codeblock Projects/libPN/PNtype.h
+	<time.h>
+	<sys/epoll.h>
+	<sys/socket.h>
+	<string.h>
+	<fcntl.h>
+	<set>
+	<memory>
+	<functional>
+
+1496839094 source:/home/ysing/codeblock Projects/libPN/main.cpp
+	"PNEventLoop.h"
+	<iostream>
+	<thread>
+

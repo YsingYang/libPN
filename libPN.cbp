@@ -40,6 +40,7 @@
 		<Unit filename="PNEventLoop.cpp" />
 		<Unit filename="PNEventLoop.h" />
 		<Unit filename="PNtype.h" />
+		<Unit filename="Tester/main.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
