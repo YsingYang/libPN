@@ -48,6 +48,8 @@ void PNEventLoop::assertInLoopThread() const {
         exit(0); //应该调用abortNotinthread方法的
     }
 }
+
+
 /*void PNEventLoop::addEvent(PNEvent * event){
 
 }*/

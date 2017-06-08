@@ -21,8 +21,19 @@
 #### 学到一个好像很吊的东西
 __thread关键字
 1. __thread是GCC内置的线程局部存储设施。它的实现非常高效，比Pthread库中的pthread_key_t（muduo中ThreadLocal）快很多。
-2. __thread变量是表示每个线程有一份独立实体，各个线程的变量值互不干扰。__thread只能修饰POD类型，不能修饰class类型，因为无法自动调用构造函数和析构函数。
+2. \__thread变量是表示每个线程有一份独立实体，各个线程的变量值互不干扰。__thread只能修饰POD类型，不能修饰class类型，因为无法自动调用构造函数和析构函数。
 
 #### 进展
    基本完成了Event的设计, 不过由于后来看书, 然后手贱去测试 eventloop了, 不过学习到__thread这个东西还是不错的, 来时正好奇为什么muduo中,可以loopInthisThread这个变量, 明天需要把Event里的内容基本实现下
    
+   
+
+## Date_3 2017. 6. 8
+#### 今日任务
+   继续完成Event的设计
+
+
+#### 任务进展
+   基本完成了Event的设计, 在进行PNEpoll的设计, 下次可以开始从event->setRevent开始写起
+   
+#### 有一点问题是, 暂时不知道eventfd在什么地方close时, 暂时觉得是在remove的

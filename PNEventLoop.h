@@ -5,6 +5,7 @@
 #include <atomic>
 #include <mutex>
 #include "PNtype.h"
+#include <vector>
 
 /*************************************************************************************
 对于one loop one event 来说, 每个线程至多只有一个eventLoop, (否则在epoll过程中会出现问题)
@@ -43,7 +44,7 @@ private:
     std::atomic<int> running_;
     std::mutex mtx_; //muduo 中这里定义成了mutable
     //std::unique_ptr<PNEpoll> epoller_;
-    //std::vector<int>
+    std::vector<PNEvent*> activeEventList_; //用于epoll返回的activechannel;
 };
 
 bool PNEventLoop::isInLoopThread() const{
