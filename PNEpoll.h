@@ -5,8 +5,9 @@
 #include <sys/epoll.h>
 #include <map>
 #include <vector>
+#include "PNEventLoop.h"
 
-class PNEventLoop;
+
 class PNEvent;
 
 class PNEpoll : boost::noncopyable{
@@ -16,14 +17,20 @@ public:
 
     void poll(std::vector<PNEvent*> &activeEventList);
 
-    bool addEvent(PNEvent* event);//添加event;
-    bool removeEvent(PNEvent* event);
-    bool updateEvent(PNEvent* event);
+    void addEvent(PNEvent* event);//添加event;
+    void  removeEvent(PNEvent* event);
+    void  updateEvent(PNEvent* event);
+
+    inline void assertInLoopThread() const;
+
+private:
+
+    void fillActivEventsList(int numsActiveEvents, std::vector<PNEvent*>& activeEventList);//将活跃的事件还给EventLoop
+    void update(int operation, PNEvent* );
+
 
 private:
     static const int InitEventListSize = 16;//const变量可以类内初始化
-
-    void fillActivEventsList(int numsActiveEvents, std::vector<PNEvent*>& activeEventList);//将活跃的事件还给EventLoop
 
     int epollFD_;
     std::map<int, PNEvent*> eventMap_;//给出一个fd->event的map
@@ -32,5 +39,9 @@ private:
     PNEventLoop* ownerLoop_;
 };
 
+
+void PNEpoll::assertInLoopThread() const{
+    ownerLoop_ ->assertInLoopThread();
+}
 
 #endif // PNEPOLL_H

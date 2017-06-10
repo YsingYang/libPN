@@ -32,6 +32,11 @@ public:
     inline PNEventLoop* getOwnerLoop() const; // 提供对所属eventloop的访问
     void removeFromEventLoop(); //从eventloop中删除
 
+    inline void enableReading();
+    inline void disableReading();
+
+    inline void enableWriting();
+    inline void disableWriting();
 
 private:
     void update();//当需要管理的event改变时, 需要对event_变量进行修改,
@@ -80,3 +85,6 @@ void PNEvent::setRevent(uint32_t revt){
 PNEventLoop* PNEvent::getOwnerLoop() const{
     return eventLoop_;
 }
+
+
+void

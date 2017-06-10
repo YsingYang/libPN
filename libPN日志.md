@@ -37,3 +37,16 @@ __thread关键字
    基本完成了Event的设计, 在进行PNEpoll的设计, 下次可以开始从event->setRevent开始写起
    
 #### 有一点问题是, 暂时不知道eventfd在什么地方close时, 暂时觉得是在remove的
+
+
+## Date_4 2017. 6. 10
+#### 吐槽
+吐槽一下有限域老师讲课内容任务分配不均, 让我花费了许多时间..很烦...
+
+
+#### 任务进展
+   基本完成了epoll类的的设计, 但是要谐调管理好event->update方法, 
+   
+#### 下次工作
+   完成event->update函数, 确保能吻合epoll->update的接口
+

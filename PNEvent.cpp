@@ -34,6 +34,7 @@ void PNEvent::handleFunc(){ //处理当前事件, 调用注册的回调函数
     }
 }
 
+
 void PNEvent::update(){
     eventLoop_->updateEvent(this); //update操作扔给Eventloop, 然后 eventloop又会扔给Epoll进行操作
 }
@@ -41,5 +42,6 @@ void PNEvent::update(){
 void PNEvent::removeFromEventLoop(){
     eventLoop_->removeEvent(this);//移除该Event
 }
+
 
 

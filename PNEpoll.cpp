@@ -1,8 +1,9 @@
 #include "PNEpoll.h"
 #include <iostream>
+#include <assert.h>
+#include "PNEvent.h"
 
-
-PNEpoll::PNEpoll(PNEventLoop* loop): ownerLoop_(loop), epollFD_(::epoll_create(EPOLL_CLOEXEC)), eventList_(InitEventListSize){
+PNEpoll::PNEpoll(PNEventLoop* loop): epollFD_(::epoll_create(EPOLL_CLOEXEC)), eventList_(InitEventListSize), ownerLoop_(loop) {
     if(epollFD_ <0){
         perror("Create epollFD error ");
         exit(0);
@@ -46,6 +47,44 @@ void PNEpoll::fillActivEventsList(int numsActiveEvents, std::vector<PNEvent*>& a
         assert(eventMap_[fd] == event);
 
         event->setRevent(eventList_[i].events);//设置返回到的事件
-        activeEventList->push_back(event);
+        activeEventList.push_back(event);
+    }
+}
+
+void PNEpoll::addEvent(PNEvent* event){
+    assertInLoopThread();
+    const int efd = event->getEventFD();
+    assert(eventMap_.find(efd) == eventMap_.end());
+    update(EPOLL_CTL_ADD, event);
+    eventMap_[efd] = event;
+}
+
+void PNEpoll::updateEvent(PNEvent* event){
+    assertInLoopThread();
+    const int efd = event->getEventFD();
+    assert(eventMap_.find(efd) != eventMap_.end());
+    update(EPOLL_CTL_MOD, event);
+}
+
+void PNEpoll::removeEvent(PNEvent* event){
+    assertInLoopThread();
+    const int efd = event->getEventFD();
+    assert(eventMap_.find(efd) != eventMap_.end());
+    update(EPOLL_CTL_DEL, event);
+    eventMap_.erase(efd);
+}
+
+
+void PNEpoll::update(int operation, PNEvent* event){
+    struct epoll_event epollEvent;
+    memset((void*)&epollEvent, 0, sizeof(epoll_event));
+
+    epollEvent.events = event->getEvent(); //获取需要监听的事件
+    epollEvent.data.ptr = event;
+    int fd = event->getEventFD();
+
+    if(epoll_ctl(epollFD_, operation, fd, &epollEvent) < 0 ){
+        perror("epoll_ctl error");
+        exit(0);
     }
 }
