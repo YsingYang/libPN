@@ -50,3 +50,19 @@ __thread关键字
 #### 下次工作
    完成event->update函数, 确保能吻合epoll->update的接口
 
+## Date_5 2017.6 12
+#### 吐槽++
+   哈哈哈哈哈, 终于搞定完有限域啦哈哈哈哈.
+   
+#### 任务
+   做好eventLoop中, 连接event 与 epoll的接口实现
+   
+#### 疑问
+   1. 在aginNet中, 他在eventloop的eventctrl里还加上了个fd -> event的map, 但是对于这个map, 在epoll中已经有了, 我觉得这是个不必要的设计
+   2. 记得之前提过一个类似的问题, epoll中的remove操作与add 操作只定义了移除/添加该fd的操作, 但并不管理event的析构, event的析构在哪里比较合理, 还是自己处理?
+
+#### 任务进度
+基本完成了eventLoop, event , epoll的设计, 通过test2的测试
+
+#### 下次任务
+添加timer计时器, 同时研究下test2下的 timer里面的一些参数

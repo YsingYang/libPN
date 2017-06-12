@@ -1,4 +1,6 @@
 #include "PNEventLoop.h"
+#include "PNEpoll.h"
+#include "PNEvent.h"
 #include <assert.h>
 #include <sys/poll.h>
 
@@ -9,8 +11,10 @@ __thread PNEventLoop* loopInThisThread = nullptr;
 //constructor
 PNEventLoop::PNEventLoop():
     thisThreadID_(std::this_thread::get_id()),
-    running_(false)
-    //epoller_(std::shared_ptr(new std::shared_ptr<PNEpoll>())),
+    running_(false),
+    quit_(true),
+    currentActiveEvent(nullptr),
+    epoller_(new PNEpoll(this))
 {
     if(loopInThisThread){
         printf("Error : existing a eventloop in this thread\n");
@@ -35,8 +39,15 @@ void PNEventLoop::loop(){ //主要执行函数
     assert(!running_);
     assertInLoopThread();
     running_ = true;//开启loop
+    quit_ = false;
 
-    poll(NULL, 0, 5 * 1000);
+    while(!quit_){
+        activeEventList_.clear();
+        epoller_->poll(activeEventList_);
+        for(auto &it : activeEventList_){ ///这里是用右值引用还是左值引用来着?
+            it->handleFunc();
+        }
+    }
 
     running_ = false; //关闭loop;
 }
@@ -50,7 +61,16 @@ void PNEventLoop::assertInLoopThread() const {
 }
 
 
-/*void PNEventLoop::addEvent(PNEvent * event){
+void PNEventLoop::addEvent(PNEvent* event){
+    epoller_->addEvent(event);
+}
 
-}*/
+void PNEventLoop::updateEvent(PNEvent* event){
+    //这里的assert可以放在epoll类中进行assert(fd)
+    epoller_->updateEvent(event);
+}
+
+void PNEventLoop::removeEvent(PNEvent* event){
+    epoller_-> removeEvent(event);
+}
 

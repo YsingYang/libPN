@@ -3,13 +3,13 @@
 #include "PNEventLoop.h"
 //定义PNEvent中几个常量变量
 
-const int PNEvent::NoneEventFlag = 0;
-const int PNEvent::readEventFlag = EPOLLIN | EPOLLPRI; //EPOLLPRI is used to receive urgent data
-const int PNEvent::writeEventFlag = EPOLLOUT;
-const int PNEvent::errorEventFlag = EPOLLERR;
+const uint32_t PNEvent::NoneEventFlag = 0;
+const uint32_t PNEvent::readEventFlag = EPOLLIN | EPOLLPRI; //EPOLLPRI is used to receive urgent data
+const uint32_t PNEvent::writeEventFlag = EPOLLOUT;
+const uint32_t PNEvent::errorEventFlag = EPOLLERR;
 
 //constructor
-PNEvent::PNEvent(PNEventLoop* loop, int fd) :eventLoop_(loop), eventFD_(fd), event_(0), revent_(0){
+PNEvent::PNEvent(PNEventLoop* loop, int fd) :eventLoop_(loop), eventFD_(fd), addinLoop(false), event_(0), revent_(0){
 
 }
 
@@ -36,6 +36,8 @@ void PNEvent::handleFunc(){ //处理当前事件, 调用注册的回调函数
 
 
 void PNEvent::update(){
+    if(!addinLoop) //如果尚未添加到eventloop中, 先添加
+        eventLoop_->addEvent(this);
     eventLoop_->updateEvent(this); //update操作扔给Eventloop, 然后 eventloop又会扔给Epoll进行操作
 }
 

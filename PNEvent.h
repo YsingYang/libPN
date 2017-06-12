@@ -38,17 +38,24 @@ public:
     inline void enableWriting();
     inline void disableWriting();
 
+    /*inline void enableError(); //这两个暂时不知道有没有什么意义
+    inline void disableError();*/
+
+    inline void disableAll();
+    inline bool isNoneEvent();
+
 private:
     void update();//当需要管理的event改变时, 需要对event_变量进行修改,
 
 private:
     PNEventLoop* eventLoop_; //只为了访问到自己属于的loop对象, 不管理loop对象的析构操作,
     int eventFD_;
+    bool addinLoop;
 
-    static const int NoneEventFlag; //这里moduo定义成了私有, 但agilNet却定义成共有, 不过感觉这一部分外部不需要吧
-    static const int readEventFlag;
-    static const int writeEventFlag;
-    static const int errorEventFlag;
+    static const uint32_t NoneEventFlag; //这里moduo定义成了私有, 但agilNet却定义成共有, 不过感觉这一部分外部不需要吧
+    static const uint32_t readEventFlag;
+    static const uint32_t writeEventFlag;
+    static const uint32_t errorEventFlag;
 
     uint32_t event_;
     uint32_t revent_;
@@ -82,9 +89,35 @@ void PNEvent::setRevent(uint32_t revt){
     revent_ = revt;
 }
 
+void PNEvent::enableReading(){
+    event_ |= readEventFlag;
+    update();
+}
+
+void PNEvent::enableWriting(){
+    event_ |= writeEventFlag;
+    update();
+}
+
+void PNEvent::disableReading(){
+    event_ &= ~readEventFlag;
+    update();
+}
+
+void PNEvent::disableWriting(){
+    event_ &= ~writeEventFlag;
+    update();
+}
+
+void PNEvent::disableAll(){
+    event_ &= NoneEventFlag;
+}
+
+bool PNEvent::isNoneEvent(){
+    return event_ == NoneEventFlag;
+}
+
 PNEventLoop* PNEvent::getOwnerLoop() const{
     return eventLoop_;
 }
 
-
-void
