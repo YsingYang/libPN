@@ -66,3 +66,54 @@ __thread关键字
 
 #### 下次任务
 添加timer计时器, 同时研究下test2下的 timer里面的一些参数
+
+## Date_6 2017. 6. 14
+实验室出去吃了顿好的~ 然后回来就没心情学习了(捂脸)
+
+内容, 先了解之前test2中timeFD的东西, 因为timer类是基于其中的timer的
+1. timerfd是Linux为用户程序提供的一个定时器接口。这个接口基于文件描述符，通过文件描述符的可读事件进行超时通知
+
+```
+int timerfd_create(int clockid, int flags);
+
+int timerfd_settime(int fd, int flags, const struct itimerspec *new_value, struct itimerspec *old_value);
+
+int timerfd_gettime(int fd, struct itimerspec *curr_value);
+```
+####timerfd_create
+第一个参数：clockid指定时间类型，有两个值：
+
+CLOCK_REALTIME :Systemwide realtime clock. 系统范围内的实时时钟
+
+CLOCK_MONOTONIC:以固定的速率运行，从不进行调整和复位 ,它不受任何系统time-of-day时钟修改的影响
+
+第二个参数：flags可以是0或者O_CLOEXEC/O_NONBLOCK。
+(O_NONBLOCK即当调用exec（）函数成功后，文件描述符会自动关闭)
+
+####timerfd_settime
+作用：用来启动或关闭有fd指定的定时器
+
+参数：
+
+fd：timerfd，有timerfd_create函数返回
+
+fnew_value:指定新的超时时间，设定new_value.it_value非零则启动定时器，否则关闭定时器，如果new_value.it_interval为0，则定时器只定时一次，即初始那次，否则之后每隔设定时间超时一次
+
+old_value：不为null，则返回定时器这次设置之前的超时时间
+
+flags：1代表设置的是绝对时间；为0代表相对时间。
+
+int timerfd_settime(int fd, int flags, const struct itimerspec *new_value, struct itimerspec *old_value);
+
+
+####
+int timerfd_gettime(int fd, struct itimerspec *curr_value);
+
+此函数用于获得定时器距离下次超时还剩下的时间。如果调用时定时器已经到期，并且该定时器处于循环模式（设置超时时间时struct itimerspec::it_interval不为0），那么调用此函数之后定时器重新开始计时。
+
+
+
+#### 总结
+感觉timer类运用上接触得相对比较少, 所以还需要继续看一看, 基本实现上是参考着agiNet, muduo上的相对会复杂一点, 先照着实现一下, 看有没有什么地方可以改变
+
+

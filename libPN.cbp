@@ -41,6 +41,9 @@
 		<Unit filename="PNEvent.h" />
 		<Unit filename="PNEventLoop.cpp" />
 		<Unit filename="PNEventLoop.h" />
+		<Unit filename="PNTimeStamp.h" />
+		<Unit filename="PNTimer.cpp" />
+		<Unit filename="PNTimer.h" />
 		<Unit filename="PNtype.h" />
 		<Unit filename="Tester/test02.cpp" />
 		<Extensions>
