@@ -106,7 +106,7 @@ flags：1代表设置的是绝对时间；为0代表相对时间。
 int timerfd_settime(int fd, int flags, const struct itimerspec *new_value, struct itimerspec *old_value);
 
 
-####
+####timerfd_gettime
 int timerfd_gettime(int fd, struct itimerspec *curr_value);
 
 此函数用于获得定时器距离下次超时还剩下的时间。如果调用时定时器已经到期，并且该定时器处于循环模式（设置超时时间时struct itimerspec::it_interval不为0），那么调用此函数之后定时器重新开始计时。
@@ -117,3 +117,22 @@ int timerfd_gettime(int fd, struct itimerspec *curr_value);
 感觉timer类运用上接触得相对比较少, 所以还需要继续看一看, 基本实现上是参考着agiNet, muduo上的相对会复杂一点, 先照着实现一下, 看有没有什么地方可以改变
 
 
+###Date-7 2017. 6. 15
+碰到了一个之前都没有遇到类, 并且觉得里面有些实现实现得封装过度的感觉, 所以Timer的学习还是慢慢来吧, 
+####TimeStamp
+昨天照着agilNet的Timer的实现也并是不完全不用功, 至少现在看回timeStamp, 也发现其实就是一个对微妙的封装
+
+先了解关于时间的一个结构体和获取时间的一个函数。
+````
+#include <time.h>
+struct timeval  {  
+    __time_t tv_sec;        /* Seconds. */  
+    __suseconds_t tv_usec;  /* Microseconds. */  
+}; 
+````
+tv_sec指从Epoc到现在的秒数。 
+tv_usec指从Epoch到现在的时间 - 秒数 剩下的微秒数。 
+Epoch指的是一个特定的时间：1970-01-01 00:00:00 UTC。
+
+###问题
+为什么源码中有个些比较的地方不用const 引用传参, 是因为TimeStamp作为一个int64_t长度的类, 直接构造会比引用传参快吗?
