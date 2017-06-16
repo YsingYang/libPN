@@ -21,12 +21,14 @@ public:
     static inline PNTimestamp fromUnixTime(time_t t, int microSeconds);
 
 public:
-
     inline void swap(PNTimestamp& rhs);
     inline bool valid() const;
     inline int64_t getMicroSeconds() const;
     //time_t 定义在private中
     inline time_t getSecond() const;
+public:
+    std::string toString() const;
+    std::string toFormattedString(bool showMicroseconds = true) const;
 
 private:
 
