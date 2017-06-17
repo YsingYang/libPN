@@ -17,6 +17,7 @@ public:
     static const int kMicroSecondsPerSecond = 1000 * 1000;
 
     static PNTimestamp now();//返回当前时间
+    static inline PNTimestamp invalid();//返回一个invalid的时间
     static inline PNTimestamp fromUnixTime(time_t t); //将time_t类型时间转化为内部是unix时间
     static inline PNTimestamp fromUnixTime(time_t t, int microSeconds);
 
@@ -68,6 +69,10 @@ PNTimestamp PNTimestamp::fromUnixTime(time_t t, int microSeconds){
 
  bool PNTimestamp::valid() const{
     return microSeconds_ > 0;
+ }
+
+ PNTimestamp PNTimestamp::invalid(){
+    return PNTimestamp();
  }
 
  int64_t PNTimestamp::getMicroSeconds() const{
