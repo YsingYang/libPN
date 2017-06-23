@@ -43,6 +43,11 @@
 		<Unit filename="PNEventLoop.h" />
 		<Unit filename="PNTimeStamp.cpp" />
 		<Unit filename="PNTimeStamp.h" />
+		<Unit filename="PNTimer.cpp" />
+		<Unit filename="PNTimer.h" />
+		<Unit filename="PNTimerId.h" />
+		<Unit filename="PNTimerQueue.cpp" />
+		<Unit filename="PNTimerQueue.h" />
 		<Unit filename="PNtype.h" />
 		<Unit filename="Tester/timestamp.cpp" />
 		<Extensions>

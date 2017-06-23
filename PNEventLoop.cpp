@@ -1,6 +1,8 @@
 #include "PNEventLoop.h"
 #include "PNEpoll.h"
 #include "PNEvent.h"
+#include "PNTimerId.h"
+#include "PNTimerQueue.h"
 #include <assert.h>
 #include <sys/poll.h>
 
@@ -14,7 +16,8 @@ PNEventLoop::PNEventLoop():
     running_(false),
     quit_(true),
     currentActiveEvent(nullptr),
-    epoller_(new PNEpoll(this))
+    epoller_(new PNEpoll(this)),
+    timerQueue_(new PNTimerQueue(this))
 {
     if(loopInThisThread){
         printf("Error : existing a eventloop in this thread\n");
@@ -52,6 +55,16 @@ void PNEventLoop::loop(){ //主要执行函数
     running_ = false; //关闭loop;
 }
 
+void PNEventLoop::runInLoop(const callback_ &cb){
+    if(isInLoopThread()){
+        cb();//如果在当前线程
+    }
+    else{
+            printf("run in other thread\n");
+            //暂时不考虑多线程情况
+    }
+}
+
 
 void PNEventLoop::assertInLoopThread() const {
     if(!isInLoopThread()){
@@ -60,6 +73,19 @@ void PNEventLoop::assertInLoopThread() const {
     }
 }
 
+PNTimerID PNEventLoop::runAt(const PNTimestamp& time, const PNTimer::TimerCallback &cb){
+    return timerQueue_->addTimer(cb, time, 0.0);
+}
+
+PNTimerID PNEventLoop::runAfter(double delay, const PNTimer::TimerCallback &cb){
+    PNTimestamp time(addTime(PNTimestamp::now(), delay)); //返回一个当前时间+delay时间
+    return runAt(time, cb);
+}
+
+PNTimerID PNEventLoop::runEvery(double interval, const PNTimer::TimerCallback &cb){
+    PNTimestamp time(addTime(PNTimestamp::now(), interval));
+    return timerQueue_->addTimer(cb, time, interval);// 在timerfd_createfd中的interval 设置为!=0
+}
 
 void PNEventLoop::addEvent(PNEvent* event){
     epoller_->addEvent(event);

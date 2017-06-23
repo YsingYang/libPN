@@ -1,5 +1,7 @@
 #include "PNTimer.h"
 
+std::atomic<int> PNTimer::TimerNumsCreate_(0);
+
 void PNTimer::run() const{
     callback_();
 }

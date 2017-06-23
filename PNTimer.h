@@ -3,11 +3,13 @@
 
 #include <sys/time.h>
 #include <functional>
-#include <PNTimeStamp.h>
+#include "PNTimeStamp.h"
 #include <atomic>
 
 class PNTimer{
 public:
+    typedef std::function<void()> TimerCallback;
+
     PNTimer(const std::function<void()>& cb, PNTimestamp when, double interval):
         callback_(cb), expiration_(when), interval_(interval), repeat_(interval > 0.0 ), sequence_(TimerNumsCreate_++){}
 
@@ -17,20 +19,21 @@ public:
     inline bool isRepeat() const;
     inline int64_t getSequence() const;
 
-    void restart(Timestamp now);
-    static inline int getTimerNumsCreate() const;
+    void restart(PNTimestamp now);
+    static inline int getTimerNumsCreate();
 
 private:
-    const std::function<void()> callback_;
+    const TimerCallback callback_;
     PNTimestamp expiration_;//到期时间戳
-    const double interval_; //间隔
+    const double interval_; //这里应该是new_value的it_interval吧
     const bool repeat_;//是否重复计时
     const int64_t sequence_; //sequence似乎是记录当前计时器的序号的
 
     static std::atomic<int>  TimerNumsCreate_; //当前创建了多少个timer, 对于这个变量来说, 需要线程安全, 如果我只把他定义为atomic<int>保证是线程安全吗
 };
 
-PNTimestamp PNTimer::getExpiratiob() const{
+
+PNTimestamp PNTimer::getExpiration() const{
     return expiration_;
 }
 
@@ -42,7 +45,7 @@ int64_t PNTimer::getSequence() const{
     return sequence_;
 }
 
-int PNTimer::getTimerNumsCreate() const{
+int PNTimer::getTimerNumsCreate(){
     return TimerNumsCreate_;//返回类型不是一个atomic<int >应该不影响本身的线程安全"?
 }
 

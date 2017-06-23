@@ -1,3 +1,6 @@
+#ifndef PNEVENT_H
+#define PNEVENT_H
+
 #include "PNtype.h"
 
 #include <boost/noncopyable.hpp>
@@ -120,4 +123,6 @@ bool PNEvent::isNoneEvent(){
 PNEventLoop* PNEvent::getOwnerLoop() const{
     return eventLoop_;
 }
+
+#endif // PNEVENT_H
 

@@ -80,6 +80,14 @@ int timerfd_settime(int fd, int flags, const struct itimerspec *new_value, struc
 
 int timerfd_gettime(int fd, struct itimerspec *curr_value);
 ```
+#### itimerspec
+```
+struct itimerspec {
+	struct timespec it_interval;  /* Interval for periodic timer */
+    struct timespec it_value;     /* Initial expiration */
+};
+```
+结构体itimerspec就是timerfd要设置的超时结构体，它的成员it_value表示定时器第一次超时时间，it_interval表示之后的超时时间即每隔多长时间超时
 ####timerfd_create
 第一个参数：clockid指定时间类型，有两个值：
 
@@ -154,3 +162,24 @@ Epoch指的是一个特定的时间：1970-01-01 00:00:00 UTC。
 
 ####工作进展
 完成简单的timerid, timer 的类的设计, 不过muduo 源码中设计到多线程下的timer设计, 有点难理解, 我觉得可以先按照书本实现, 再慢慢理解
+
+###Date-10 2017. 6. 22
+考完试后浪了3天回来...发现之前写了什么都不太记得了...T^T, 
+
+####疑问点
+1. 关于PNTimerQueue::addTimerInLoop
+```
+ bool earliestChanged = insert(timer);//该timer, s是否最早到时
+    if(earliestChanged ){//为什么最早到时是需要reset
+        resetTimerFd(timerFd_, timer->getExpiration());
+    }
+```
+对于变量earliestChanged, 似乎是检查最早到时的(如果没理解错), 但是为什么最早到时需要reset(reset封装了timer_setting)
+
+####任务进度
+基本完成TimeQueue的单线程设计, 不过还没加上测试函数, 同时相应理解方面也只是表面, 
+
+
+####明天任务
+1. 完成测试函数
+2. 了解一下对于每个Timer的删除时机, 是在handle完read的时候?
