@@ -31,6 +31,7 @@ private:
     void addTimerInLoop(std::shared_ptr<PNTimer> timer);
     void cancelTimerInloop(PNTimerID timerid);
     void handleRead();//处理读事件
+    void reset(const std::vector<TimerKey>& expired, PNTimestamp now);
     bool insert(std::shared_ptr<PNTimer> timer);
     std::vector<TimerKey> getExpired(PNTimestamp now);//获取当前超时时间
 

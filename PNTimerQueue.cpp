@@ -28,6 +28,19 @@ struct timespec howMuchTimeFromNow(PNTimestamp when){
     return ts;
 };
 
+/**
+自manpage
+read(2) If the timer has already expired one or more times since its settings were last modified using timerfd_settime(), or since the last successful read(2),
+ then the buffer given to read(2) returns an unsigned 8-byte integer (uint64_t) containing the number of expirations that have occurred
+**/
+void readTimerfd(int timerfd, PNTimestamp now){
+    uint64_t times;
+    ssize_t n = ::read(timerfd, &times, sizeof(times));
+    printf("this time expired times : %ld \n",times );
+    assert( n == sizeof(times)); //只支持64位机器下的e
+
+}
+
 void resetTimerFd(int timerFd, PNTimestamp expiration){ //提供对timersetting的接口
     struct itimerspec newTime;
     struct itimerspec oldTime;
@@ -65,7 +78,19 @@ PNTimerQueue::~PNTimerQueue(){
 #endif // __GXX_EXPERIMENTAL_CXX0X__
 
 void PNTimerQueue::handleRead(){
-        printf("excuted handleFunctor\n");
+        loop_->assertInLoopThread();
+        PNTimestamp now(PNTimestamp::now());
+        readTimerfd(timerFd_, now);//读取当前超时出现次数
+
+        std::vector<TimerKey> expired = getExpired(now); //超时timer队列
+
+        for(std::vector<TimerKey>::iterator it = expired.begin(); it != expired.end(); ++it){
+            it->second->run(); //遍历每一个超时timer, 并执行相应的run 方法, 其实就是执行timer的回调
+        }
+        reset(expired, now);
+
+
+
 }
 
 PNTimerID PNTimerQueue::addTimer(const std::function<void()>& cb, PNTimestamp when, double interval){
@@ -82,6 +107,22 @@ void PNTimerQueue::addTimerInLoop(std::shared_ptr<PNTimer> timer){
     }
 }
 
+//重置expired数组
+void PNTimerQueue::reset(const std::vector<TimerKey>& expired, PNTimestamp now){
+    PNTimestamp nextExpire; //下一次超时时间
+    for(std::vector<TimerKey>::const_iterator it = expired.cbegin(); it != expired.cend(); ++it){
+        if(it->second->isRepeat()){ //如果该定时器是
+            it->second->restart(now);
+            insert(it->second); //重新插入到timer集合中
+        }
+    }
+    if(!timers_.empty()){
+        nextExpire = timers_.begin()->second->getExpiration();
+    }
+    if(nextExpire.valid()){
+        resetTimerFd(timerFd_, nextExpire);//重新开始监听超时事件
+    }
+}
 
 bool PNTimerQueue::insert(std::shared_ptr<PNTimer> timer){
     loop_->assertInLoopThread();

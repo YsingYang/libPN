@@ -9,6 +9,7 @@
 #include <vector>
 #include <functional>
 #include "PNTimer.h"
+#include "PNTimerId.h"
 
 /*************************************************************************************
 对于one loop one event 来说, 每个线程至多只有一个eventLoop, (否则在epoll过程中会出现问题)
@@ -19,7 +20,6 @@ eventloop调用相应IO多路复用操作得到就绪的Event
 
 class PNEvent;
 class PNEpoll;
-class PNTimerID;
 class PNTimestamp;
 class PNTimer;
 class PNTimerQueue;

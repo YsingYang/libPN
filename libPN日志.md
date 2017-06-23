@@ -183,3 +183,33 @@ Epoch指的是一个特定的时间：1970-01-01 00:00:00 UTC。
 ####明天任务
 1. 完成测试函数
 2. 了解一下对于每个Timer的删除时机, 是在handle完read的时候?
+
+
+###Date-11 2017. 6. 23
+发现[muduo网络库编程教程](https://github.com/chenshuo/recipes/tree/master/reactor)里有相应教程(发现恨晚...)
+####当天任务进展
+完成timerQueue的测试, 对于之前的疑问, 似乎能连结在一起想通, 对于timerQueue, 无非就是每次将一个functor与一个timer绑定在一起, 加入到timerSet中, EventLoop只负责执行相应Queue的addTimer, handlerRead, 同时, 由于timerfd是可以由epoll返回的, 当epoll返回时, 会自动执行相应根据timer创建好的event, (相当于把timer就当做成一个event), 时间超时会, 会自动自行相应注册好的回调时间(handlerRead), handlerRead会查找set中超时集合, 并调用集合中每个元素的run方法(注册到timer的回调函数)
+
+####疑问点
+在TimerQueue之中有个问题一直每台搞懂, 下面这个函数是做莫子用的.. 首先他最对读取8byte, 另外它读取到的会是什么
+````
+void readTimerfd(int timerfd, Timestamp now)
+{
+  uint64_t howmany;
+  ssize_t n = ::read(timerfd, &howmany, sizeof howmany);
+  LOG_TRACE << "TimerQueue::handleRead() " << howmany << " at " << now.toString();
+  if (n != sizeof howmany)
+  {
+    LOG_ERROR << "TimerQueue::handleRead() reads " << n << " bytes instead of 8";
+  }
+}
+````
+查找了一下发现这个函数会在handleRead中调用, handleRead里面传入给该函数的timerFd中的timerfd_变量, 翻阅了一下, 这根timerfd的read有关, timerfd的read返回的是超时次数
+当定时器超时，read读事件发生即可读，返回超时次数（从上次调用timerfd_settime()启动开始或上次read成功读取开始），它是一个8字节的unit64_t类型整数，如果定时器没有发生超时事件，则read将阻塞若timerfd为阻塞模式，否则返回EAGAIN 错误（O_NONBLOCK模式），如果read时提供的缓冲区小于8字节将以EINVAL错误返回。
+
+
+
+
+
+
+####下次工作预计

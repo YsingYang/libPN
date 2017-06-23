@@ -49,7 +49,7 @@
 		<Unit filename="PNTimerQueue.cpp" />
 		<Unit filename="PNTimerQueue.h" />
 		<Unit filename="PNtype.h" />
-		<Unit filename="Tester/timestamp.cpp" />
+		<Unit filename="Tester/test04.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
