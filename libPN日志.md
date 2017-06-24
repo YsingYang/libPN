@@ -208,8 +208,12 @@ void readTimerfd(int timerfd, Timestamp now)
 当定时器超时，read读事件发生即可读，返回超时次数（从上次调用timerfd_settime()启动开始或上次read成功读取开始），它是一个8字节的unit64_t类型整数，如果定时器没有发生超时事件，则read将阻塞若timerfd为阻塞模式，否则返回EAGAIN 错误（O_NONBLOCK模式），如果read时提供的缓冲区小于8字节将以EINVAL错误返回。
 
 
-
-
-
-
 ####下次工作预计
+
+
+###Date-12 2017. 6. 24
+今天忙完了ssh后, 没有太多时间继续搞, 所以随便温习一下, 同时看下下一步的实现
+
+####下次工作预估
+这次给EventLoop增加的内容, 核心无非就是pendingFunctor, 这个东西避免线程间的干扰吧. 其实补太理解具体的用意. 不过之中用到一个pipe fd唤醒线程, 这个地方之前阿里面试官问过我, 感觉这里可以认真了解一下.
+

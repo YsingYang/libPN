@@ -56,7 +56,8 @@ public:
 private:
     //成员函数
     inline bool isInLoopThread() const;
-    void abortNotInLoopThread();
+    void handleRead();
+    void doPendingFunctors();
 
 private:
     //成员变量
@@ -64,11 +65,18 @@ private:
     static int activeEventLength;
     std::atomic<int> running_;
     std::atomic<bool> quit_;
-    std::mutex mtx_; //muduo 中这里定义成了mutable
     PNEvent* currentActiveEvent; //我觉得该变量定义在这里的目的是不需要多次在loop里面构造又析构, 即便只是一个指针
     std::unique_ptr<PNEpoll> epoller_;
     std::unique_ptr<PNTimerQueue> timerQueue_;
     std::vector<PNEvent*> activeEventList_; //用于epoll返回的activechannel;
+
+    PNTimestamp epollReturnTime_;//用于epoll定时?
+    std::atomic<bool> callingPendingFunctors;
+    int wakeupFd_; //监听唤醒pipe;
+    std::unique_ptr<PNEvent> wakeupEvent_;//唤醒事件
+    std::mutex mtx_; //muduo 中这里定义成了mutable
+    std::vector<std::function<void()>> pendingFunctors_; //待处理回调, 需要用mutex_保证线程安全
+
 
 };
 

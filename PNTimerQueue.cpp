@@ -88,21 +88,20 @@ void PNTimerQueue::handleRead(){
             it->second->run(); //遍历每一个超时timer, 并执行相应的run 方法, 其实就是执行timer的回调
         }
         reset(expired, now);
-
-
-
 }
 
 PNTimerID PNTimerQueue::addTimer(const std::function<void()>& cb, PNTimestamp when, double interval){
     std::shared_ptr<PNTimer>timer(new PNTimer(cb, when, interval));
+
     loop_->runInLoop(std::bind(&PNTimerQueue::addTimerInLoop, this, timer));
+
     return PNTimerID(timer.get(), timer->getSequence());//注意这里把指针给了runInLoop, 但runInLoop不管理该timer的删除,
 }
 
 void PNTimerQueue::addTimerInLoop(std::shared_ptr<PNTimer> timer){
     loop_->assertInLoopThread();
     bool earliestChanged = insert(timer);//该timer, s是否最早到时
-    if(earliestChanged ){//为什么最早到时是需要reset
+    if(earliestChanged ){// 如果是最早到时, 调用reset
         resetTimerFd(timerFd_, timer->getExpiration());
     }
 }
