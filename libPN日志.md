@@ -217,3 +217,14 @@ void readTimerfd(int timerfd, Timestamp now)
 ####下次工作预估
 这次给EventLoop增加的内容, 核心无非就是pendingFunctor, 这个东西避免线程间的干扰吧. 其实补太理解具体的用意. 不过之中用到一个pipe fd唤醒线程, 这个地方之前阿里面试官问过我, 感觉这里可以认真了解一下.
 
+
+### Date-13 2017. 6. 25
+昨天对EventLoop增加了一些成员变量处理pendingFunctor, 之中涉及到一个wakeUpfd, 用于唤醒线程处理相应事件, 对于该fd的创建, 用到了一个createfd函数
+```
+int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+这个函数会创建一个 事件对象 (eventfd object), ** 用来实现，进程(线程)间的等待/通知(wait/notify) 机制 **. 内核会为这个对象维护一个64位的计数器(uint64_t)。
+```
+man page原话
+> The object contains an unsigned 64-bit integer (uint64_t) counter that is maintained by the kernel.  This counter is initialized with the value specified in the argument initval.
+
+

@@ -39,6 +39,7 @@ public:
     void removeEvent(int );//fd重载版本
     bool hasEvent(PNEvent* );
     inline void quit();
+    void wakeup();//唤醒某个线程
     void assertInLoopThread() const; // 这个函数设置成inline的话成本有多高?
 
     void runInLoop(const callback_ &cb);
@@ -76,8 +77,6 @@ private:
     std::unique_ptr<PNEvent> wakeupEvent_;//唤醒事件
     std::mutex mtx_; //muduo 中这里定义成了mutable
     std::vector<std::function<void()>> pendingFunctors_; //待处理回调, 需要用mutex_保证线程安全
-
-
 };
 
 bool PNEventLoop::isInLoopThread() const{
