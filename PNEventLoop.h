@@ -54,6 +54,9 @@ public:
 
     PNEventLoop* getEventLoopOnThread() const;
 
+    void queueInLoop(const std::function<void()> & cb); ///muduo这里是public, 我觉得private就可以了吧? 需要给外部调用吗?
+
+
 private:
     //成员函数
     inline bool isInLoopThread() const;
@@ -72,7 +75,7 @@ private:
     std::vector<PNEvent*> activeEventList_; //用于epoll返回的activechannel;
 
     PNTimestamp epollReturnTime_;//用于epoll定时?
-    std::atomic<bool> callingPendingFunctors;
+    std::atomic<bool> callingPendingFunctors_;
     int wakeupFd_; //监听唤醒pipe;
     std::unique_ptr<PNEvent> wakeupEvent_;//唤醒事件
     std::mutex mtx_; //muduo 中这里定义成了mutable
@@ -85,6 +88,9 @@ bool PNEventLoop::isInLoopThread() const{
 
 void PNEventLoop::quit(){
     quit_ = true;
+    if(!isInLoopThread()){
+        wakeup(); //如果不是当前线程执行quit , 唤醒该线程
+    }
 }
 
 #endif // EVENTLOOP_H

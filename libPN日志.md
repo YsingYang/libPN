@@ -228,3 +228,16 @@ man page原话
 > The object contains an unsigned 64-bit integer (uint64_t) counter that is maintained by the kernel.  This counter is initialized with the value specified in the argument initval.
 
 
+
+### Date-14 2017. 6. 26
+####内容 : 完成runInLoop的设计
+之前一致想补明白的是, handlerRead, 与wakeup到底什么卵用, 不就是一个写一个读吗, 如果没有, epoll_Loop还是继续执行, doPendingFunctor函数也会继续执行, 好像可有可无一样, 仔细想想其实不是的, 因为我忘记了epoll也是会阻塞在epoll_wait上的!
+> 
+解释一下这里唤醒的意思, 刚才拍了下脑袋竟然想明白了
+我们知道如果对epoll进行定时,(或者说无限等待-1), 那么线程将会阻塞在epoll_wait()上
+这时候为了唤醒该线程, 我们需要人为地给该线程制造一个事件, 而这里用到的就是wakeupFD,
+
+另外一点, 关于pendingFunctor这个数组, 由于前提reactor模式下是one loop one thread的, 所以说, 可能会有其他线程执行并不属于他自己的EventLoop, 但是pengdingFunctor一定只属于某个线程的, 所以别的线程只会将cb放入pendingFunctor中然后wakeup一下, 就走人, 执行pendingFunctor的一定是所属线程他本身
+
+####测试
+通过测试函数, 当给不同的线程调用runInLoop的时候, 其他线程只会将callback放入pendingFunctors中
