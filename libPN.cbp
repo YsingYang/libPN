@@ -41,6 +41,8 @@
 		<Unit filename="PNEvent.h" />
 		<Unit filename="PNEventLoop.cpp" />
 		<Unit filename="PNEventLoop.h" />
+		<Unit filename="PNEventLoopThread.cpp" />
+		<Unit filename="PNEventLoopThread.h" />
 		<Unit filename="PNTimeStamp.cpp" />
 		<Unit filename="PNTimeStamp.h" />
 		<Unit filename="PNTimer.cpp" />
@@ -49,7 +51,7 @@
 		<Unit filename="PNTimerQueue.cpp" />
 		<Unit filename="PNTimerQueue.h" />
 		<Unit filename="PNtype.h" />
-		<Unit filename="Tester/test05.cpp" />
+		<Unit filename="Tester/test06.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
