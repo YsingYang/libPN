@@ -241,3 +241,31 @@ man page原话
 
 ####测试
 通过测试函数, 当给不同的线程调用runInLoop的时候, 其他线程只会将callback放入pendingFunctors中
+
+### Date-15 2017. 6. 27
+####内容 : 提高TimeQueue的线程安全性
+1. 首先实验一段muduo中crash的代码, 但是我这边并没有crash, 而是停在那里. 不过后来想了下..因为我没有调用QUIT. 后来发现, 原来我已经按照源代码将这个问题解决了..这里就牵扯到了addTimerInLoop这个函数的作用, 它是用来保证线程安全的
+   我们知道runInLoop这个函数是线程安全的, 如果我们将addTimerInLoop抽象出来, 作为一个回调, 交给runInLoop来处理的话, 就可以保证添加Timer的线程安全了
+   
+2. 添加EventLoopThread class
+ 这里实现要跟muduo有一点不同, 因为我使用的是C++11的thread类, 而muduo有自带的thread类.
+ moduo, thread有自带start方法, 所以保证, 只有在startLoop之中调用thread.start的时候, threadFunc才会启动, 但是我的实现不会, 因为我是将函数直接传给thread的构造函数, 那么, 就会有可能threadFunc在start前执行, 
+ 
+ 我的想出来的处理方法有两个
+ 1.
+
+ ```
+ {
+        std::lock_guard<std::mutex> lck(mutex_); ///为了保证threadFunc在startLoop调用后执行, 构造一个领界区, 里面有thread temp变量, swapEventLoopThread中的thread_
+        std::thread temp(std::bind(&PNEventLoopThread::threadFunc, this));
+        swap(temp, thread_);
+    }
+    ```
+ 2.
+ ```
+ 我觉得只要在threadFunct中调用一个cond_.wait()
+ 然后再在startThread开始时添加个notify()就可以了
+ 
+ 
+ 现在暂时用第一种代码, 虽然按道理来说, 第二种方案会相对比较优化
+ ```

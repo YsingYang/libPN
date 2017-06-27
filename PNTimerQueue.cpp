@@ -92,7 +92,6 @@ void PNTimerQueue::handleRead(){
 
 PNTimerID PNTimerQueue::addTimer(const std::function<void()>& cb, PNTimestamp when, double interval){
     std::shared_ptr<PNTimer>timer(new PNTimer(cb, when, interval));
-
     loop_->runInLoop(std::bind(&PNTimerQueue::addTimerInLoop, this, timer));
 
     return PNTimerID(timer.get(), timer->getSequence());//注意这里把指针给了runInLoop, 但runInLoop不管理该timer的删除,
