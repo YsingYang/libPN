@@ -35,6 +35,9 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="InetAddress.cpp" />
+		<Unit filename="InetAddress.h" />
+		<Unit filename="PNAccetpor.h" />
 		<Unit filename="PNEpoll.cpp" />
 		<Unit filename="PNEpoll.h" />
 		<Unit filename="PNEvent.cpp" />
@@ -43,6 +46,7 @@
 		<Unit filename="PNEventLoop.h" />
 		<Unit filename="PNEventLoopThread.cpp" />
 		<Unit filename="PNEventLoopThread.h" />
+		<Unit filename="PNSocketStruct.h" />
 		<Unit filename="PNTimeStamp.cpp" />
 		<Unit filename="PNTimeStamp.h" />
 		<Unit filename="PNTimer.cpp" />
