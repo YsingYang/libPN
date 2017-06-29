@@ -26,9 +26,11 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-std=c++11" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libpthread.so" />
 				</Linker>
 			</Target>
 		</Build>
@@ -37,6 +39,7 @@
 		</Compiler>
 		<Unit filename="InetAddress.cpp" />
 		<Unit filename="InetAddress.h" />
+		<Unit filename="PNAccept.cpp" />
 		<Unit filename="PNAccetpor.h" />
 		<Unit filename="PNEpoll.cpp" />
 		<Unit filename="PNEpoll.h" />
@@ -46,6 +49,7 @@
 		<Unit filename="PNEventLoop.h" />
 		<Unit filename="PNEventLoopThread.cpp" />
 		<Unit filename="PNEventLoopThread.h" />
+		<Unit filename="PNSocketStruct.cpp" />
 		<Unit filename="PNSocketStruct.h" />
 		<Unit filename="PNTimeStamp.cpp" />
 		<Unit filename="PNTimeStamp.h" />
@@ -55,7 +59,7 @@
 		<Unit filename="PNTimerQueue.cpp" />
 		<Unit filename="PNTimerQueue.h" />
 		<Unit filename="PNtype.h" />
-		<Unit filename="Tester/test06.cpp" />
+		<Unit filename="Tester/test07.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

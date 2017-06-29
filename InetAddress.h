@@ -1,7 +1,9 @@
-#ifndef "PNINETADDRESS_H"
-#define "PNINETADDRESS_H"
+#ifndef PNINETADDRESS_H
+#define PNINETADDRESS_H
 
 #include <netinet/in.h>
+#include <string>
+
 
 class InetAddress { //copyable
 public:
@@ -11,22 +13,24 @@ public:
 
     InetAddress(const InetAddress&) = default;
     InetAddress& operator= (const InetAddress&) = default;
-    ~InetAddress = default;
+    ~InetAddress() = default;
 
     std::string getFormatString() const;
 
-    inline struct sockaddr_in& getSockAddr() const;
+    inline const struct sockaddr_in& getSockAddr() const;
     inline  void setSockaddr(const struct sockaddr_in& );
 private:
     struct sockaddr_in addr_;
 };
 
-struct sockaddr_in& InetAddress::getSockAddr() const{
+const struct sockaddr_in& InetAddress::getSockAddr() const{
     return addr_;
 };
 
 void InetAddress::setSockaddr(const struct sockaddr_in& addr){
     addr_ = addr;
 }
+void setNoBlockAndCloseOnExec(int fd);
 
+int createSocketFD(bool noblock = false);
 #endif

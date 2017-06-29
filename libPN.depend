@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1498567988 source:/home/ysing/codeblock Projects/libPN/PNEventLoop.cpp
+1498747525 source:/home/ysing/codeblock Projects/libPN/PNEventLoop.cpp
 	"PNEventLoop.h"
 	"PNEpoll.h"
 	"PNEvent.h"
@@ -142,7 +142,7 @@
 	"../PNEventLoop.h"
 	<thread>
 
-1498571225 source:/home/ysing/codeblock Projects/libPN/PNEventLoopThread.cpp
+1498571502 source:/home/ysing/codeblock Projects/libPN/PNEventLoopThread.cpp
 	"PNEventLoopThread.h"
 	"PNEventLoop.h"
 
@@ -154,5 +154,48 @@
 1498570366 source:/home/ysing/codeblock Projects/libPN/Tester/test06.cpp
 	"../PNEventLoop.h"
 	"../PNEventLoopThread.h"
+	<stdio.h>
+
+1498747903 source:/home/ysing/codeblock Projects/libPN/InetAddress.cpp
+	"InetAddress.h"
+	<string.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<fcntl.h>
+	<stdio.h>
+
+1498748319 /home/ysing/codeblock Projects/libPN/InetAddress.h
+	<netinet/in.h>
+	<string>
+
+1498748375 source:/home/ysing/codeblock Projects/libPN/PNAccept.cpp
+	"PNAccetpor.h"
+	"InetAddress.h"
+	"PNEventLoop.h"
+	"PNSocketStruct.h"
+
+1498742233 /home/ysing/codeblock Projects/libPN/PNAccetpor.h
+	<boost/noncopyable.hpp>
+	<functional>
+	"PNEvent.h"
+	"PNSocketStruct.h"
+
+1498744695 /home/ysing/codeblock Projects/libPN/PNSocketStruct.h
+	<boost/noncopyable.hpp>
+
+1498748319 source:/home/ysing/codeblock Projects/libPN/PNSocketStruct.cpp
+	"PNSocketStruct.h"
+	"InetAddress.h"
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<boost/implicit_cast.hpp>
+	<string.h>
+
+1498748436 source:/home/ysing/codeblock Projects/libPN/Tester/test07.cpp
+	"../InetAddress.h"
+	"../PNAccetpor.h"
+	"../PNEventLoop.h"
 	<stdio.h>
 

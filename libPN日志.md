@@ -262,16 +262,44 @@ man page原话
     }
     ```
  2.
- ```
+
  我觉得只要在threadFunct中调用一个cond_.wait()
  然后再在startThread开始时添加个notify()就可以了
  
  
  现在暂时用第一种代码, 虽然按道理来说, 第二种方案会相对比较优化
-```
+
 
 ### Date-16 2017. 6. 28
 实现完Event那一块， 和TimerQueue那一块后。 基本底层的就实现的差不多了， 可以将这些封装了一个Server(假定mutex_这些用现有的实现)
 ####内容 : Acceptor的实现
 在PassingNote中， 我原本想的实现是sockfd, 与sockaddr合在一起成为一个socketStruct, 但是这边的实现是抽离开，感觉分开也有一定道理， 低耦合那么有没有更好的实现
 今天主要实现了inet类， 基本完成了相关实现， 不过一些封装上没有跟muduo完全一样， 主要是自己需求上吧..不过基本一样就是了。。
+
+
+### Date-17 2017. 6. 29
+终于考完算法了..不过感觉自己考的不理想就是了..也不能全怪昨晚没睡好， 实力问题吧
+
+
+
+1. 今天发现了一个SOMAXCONN 定义与 <sys/socket.h> , 其实是用于listen的第二个参数（listen队列最大连接数）， 有网上说一般Linux默认值为128， 如果对于负载大的服务器来说显然太小？ 但所有服务器都是128吗？这是man page上的描述
+```
+If the backlog argument is greater than the value in /proc/sys/net/core/somaxconn, then it is silently truncated to that value; the default value in this file is 128. In kernels before 2.4.25, this limit was a hard coded value, 
+SOMAXCONN, with the value 128.
+```
+
+2. SO_REUSEADDR
+ 之前没有太注意这个setsockopt中的这个Flag, 其实这个字段是用于让端口释放后立即就可以被再次使用， 一般来说，一个端口释放后会等待两分钟之后才能再被使用， 这也就是之前我测试的时候经常中断程序， 又开启的时候出现的binderror , 就是因为设置reuse, 但他其实还有其他用途， 这里抄自其他博客
+ ```
+     SO_REUSEADDR允许启动一个监听服务器并捆绑其众所周知端口，即使以前建立的将此端口用做他们的本地端口的连接仍存在。这通常是重启监听服务器时出现，若不设置此选项，则bind时将出错。
+    SO_REUSEADDR允许在同一端口上启动同一服务器的多个实例，只要每个实例捆绑一个不同的本地IP地址即可。对于TCP，我们根本不可能启动捆绑相同IP地址和相同端口号的多个服务器。
+    SO_REUSEADDR允许单个进程捆绑同一端口到多个套接口上，只要每个捆绑指定不同的本地IP地址即可。这一般不用于TCP服务器。
+    SO_REUSEADDR允许完全重复的捆绑：当一个IP地址和端口绑定到某个套接口上时，还允许此IP地址和端口捆绑到另一个套接口上。一般来说，这个特性仅在支持多播的系统上才有，而且只对UDP套接口而言（TCP不支持多播）。
+ ```
+ 
+3. 返回引用值， 之前在研究项目工程上不知道如何返回一个引用， 今天惊奇的发现好像可以返回一个常量引用
+```
+const struct sockaddr_in& getSockAddrInet() const { return addr_; }
+如果把const去掉就是错误的..很神奇..这是为了保护不返回空引用吗？
+```
+4. 今天在一个常出的笔试题上出BUg, 我把一个数组指针传入函数， 再对这个指针取sizeof()这时候在该函数里返回的是一个指针大小的值8， 而不是数组长度， 如果在原函数上就是数组长度
