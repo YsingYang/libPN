@@ -27,8 +27,6 @@ void PNAcceptor::handleRead(){
     loop_->assertInLoopThread();//避免跨线程调用
     InetAddress peerAddr(0);//
     int connfd = acceptSocket_.accept(&peerAddr);
-    struct sockaddr_in temp;
-
     if(connfd >= 0){
         if(callback_){
             callback_(connfd, peerAddr);

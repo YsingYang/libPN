@@ -29,7 +29,6 @@ int PNSocketStruct::accept(InetAddress* peeraddr ){ //传入的一般是peerSock
     struct sockaddr_in addr;
     bzero(&addr, sizeof(addr));
     socklen_t addrLength = sizeof(sockaddr_in);
-    printf("listening\n");
     int connfd = ::accept(sockFD_, static_cast<sockaddr*> (boost::implicit_cast<void*>(&addr)), &addrLength);
 
 
