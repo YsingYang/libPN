@@ -37,6 +37,16 @@ void initSocketAddr(const char* ip, uint16_t port, struct sockaddr_in* addr){
     }
 }
 
+struct sockaddr_in getLocalAddr(int sockfd){
+        struct sockaddr_in localAddr;
+        bzero(&localAddr, sizeof(localAddr));
+        socklen_t addrLength = sizeof(localAddr);
+        if(::getsockname(sockfd, (struct sockaddr*)&localAddr, &addrLength < 0))
+            perror("getLocalAddress error : ");
+        return localAddr;
+
+}
+
 //返回string格式的ip, 注意这里用了引用传参
 inline void getFormatIP(char* ipBuff, size_t buffSize,const  struct sockaddr_in& addr){
     inet_ntop(AF_INET, &addr.sin_addr, ipBuff, 32 ); ///注意这里不能用sizeof(ipBuff, 传入的是一个指针， 这里sizeof会返回8(64位)

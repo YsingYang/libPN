@@ -33,4 +33,6 @@ void InetAddress::setSockaddr(const struct sockaddr_in& addr){
 void setNoBlockAndCloseOnExec(int fd);
 
 int createSocketFD(bool noblock = false);
+
+struct sockaddr_in getLocalAddr(int sockfd);
 #endif

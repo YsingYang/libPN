@@ -5,10 +5,13 @@
 #include  <boost/noncopyable.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "callbackType.h"
+#include "InetAddress.h"
 #include <memory>
 #include <atomic>
 
 class PNEventLoop;
+class PNSocketStruct;
+class PNEvent;
 
 class PNTCPConnection : boost::noncopyable, public std::enable_shared_from_this<PNTCPConnection>{
 public:
@@ -20,8 +23,8 @@ public:
     //对外访问接口
     inline PNEventLoop* getLoop() const;
     inline const std::string& getName() const;
-    inline const InetAddress& getLocalAddr();
-    inline const InetAddress& getPeerAddr();
+    inline const InetAddress& getLocalAddr() const;
+    inline const InetAddress& getPeerAddr() const;
     inline bool getConnected() const;
     inline void setConnectionCallback(const ConnectionCallback& cb);
     inline void setMessageCallback(const MessageCallback& cb);
@@ -54,7 +57,7 @@ PNEventLoop* PNTCPConnection::getLoop() const{
 }
 
 const std::string& PNTCPConnection::getName() const{
-    return name_
+    return name_;
 }
 
 const InetAddress& PNTCPConnection::getLocalAddr() const{

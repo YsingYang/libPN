@@ -39,7 +39,7 @@
 		</Compiler>
 		<Unit filename="InetAddress.cpp" />
 		<Unit filename="InetAddress.h" />
-		<Unit filename="PNAccept.cpp" />
+		<Unit filename="PNAcceptor.cpp" />
 		<Unit filename="PNAccetpor.h" />
 		<Unit filename="PNEpoll.cpp" />
 		<Unit filename="PNEpoll.h" />
@@ -51,6 +51,10 @@
 		<Unit filename="PNEventLoopThread.h" />
 		<Unit filename="PNSocketStruct.cpp" />
 		<Unit filename="PNSocketStruct.h" />
+		<Unit filename="PNTCPConnection.cpp" />
+		<Unit filename="PNTCPConnection.h" />
+		<Unit filename="PNTCPServer.cpp" />
+		<Unit filename="PNTCPServer.h" />
 		<Unit filename="PNTimeStamp.cpp" />
 		<Unit filename="PNTimeStamp.h" />
 		<Unit filename="PNTimer.cpp" />
@@ -59,7 +63,8 @@
 		<Unit filename="PNTimerQueue.cpp" />
 		<Unit filename="PNTimerQueue.h" />
 		<Unit filename="PNtype.h" />
-		<Unit filename="Tester/test07.cpp" />
+		<Unit filename="Tester/test08.cpp" />
+		<Unit filename="callbackType.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

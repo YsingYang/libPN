@@ -303,3 +303,69 @@ const struct sockaddr_in& getSockAddrInet() const { return addr_; }
 如果把const去掉就是错误的..很神奇..这是为了保护不返回空引用吗？
 ```
 4. 今天在一个常出的笔试题上出BUg, 我把一个数组指针传入函数， 再对这个指针取sizeof()这时候在该函数里返回的是一个指针大小的值8， 而不是数组长度， 如果在原函数上就是数组长度
+
+
+### Date-18 2017. 6. 30
+开始时将muduo书中的两个扩展练习写了一下
+1. 将test7.cc改写为daytime服务器, 这个就是在acceptor的回调函数中用timestamp的now().formatString即可。
+2. 同时监听2个port, 看到这里的时候突然想回去看自己当初的EventLoop, event, epoll是怎么协调工作的...这里复习一下， 当我们创建Event时并没有将event加入到epoll中， 而EventLoop放置event更无从谈起， 直到event.setcallback的时候， 会调用update, update会调用loop->update, 再调用epoll->update， 这时候才是加入到epoll中
+ 这个问题也很简单， 多写一个Acceptor就可以了。
+ 
+现在只是将Acceptor简单的调用一个回调。 对于一个服务器来说， 应该需要调用一个新连接函数， 而muduo中会创建TcpServer类。 现在先处理连接建立
+
+# 学到一个新东西enable_shared_from_this
+在muduo的connection类中出现了一个boost::enable_shared_from_this<T> 这个奇奇怪怪的东东， 这个东西是为了让类自身能获取到自身的智能指针， 比如我用shared_ptr<T>封装了一个T, 当我们在T类中， 得到的仅仅是一个this裸指针， 我们可以通过继承上面那个奇奇怪怪的东东得到获取自身智能指针。
+**为什么要有这么奇葩的东西**
+知乎上轮子哥给出了他的回答
+> 然而在类的内部获得自己的shared_ptr这件事情是很难避免的
+
+**也有人会问 : 我直接写个函数， 把this包装一下返回一个shared_ptr不就行了嘛**
+这样子做返回的并不是该this的shared_ptr， 不巧它重新创建了一个新的shared_ptr, 相当于有两个不同的shared_ptr指向一个实例。 
+[Cplusplus](http://en.cppreference.com/w/cpp/memory/enable_shared_from_this) CPPreference给出了一个example.
+至于原理， 在[blog](http://blog.guorongfei.com/2017/01/25/enbale-shared-from-this-implementaion/)中有说明， 本质上是会shared_ptr这个类做了点文章， 自己维护一个哈希， 或者成员变量， 当调用get返回就行了
+```
+class shared_ptr<Widget> {
+public:
+    explicit shared_ptr<Widget>(Widget* w) {
+        // 其他初始化，可能在初始化列表中而不是构造函数内部
+        RegisterSharedPtr(w, this);
+    }
+};
+void RegisterSharedPtr(Widget* w, shared_ptr<Widget>* sp) {
+    // 建立 w 到 sp 的映射关系
+}
+void GetSharedPtr(Widget* w) {
+    // 查找 w 对应的 sp
+}
+class Widget {
+public:
+    shared_ptr<Widget> shared_from_this() {
+        GetSharedPtr(this);
+    }
+};
+```
+
+
+### Date-19 2017. 7. 1
+继续完成昨天的任务， 昨天只完成了Connection.h的实现. 
+1. 在TCPServer中发现了一个成员变量ConnID,从字面意义上理解， 似乎是用于记录连接上服务器的后给这些客户端分配的一个id,还能起到统计数量的作用， 但实际有没有更深的意义或者说别的意义还有待考察
+2. 还有第二个问题是，在TcpServer::newConnection函数中， 传入的sockfd函数， 到底是监听的fd, 还是在accept后得到的fd, ?????
+3. 在C++11中， 有时候我们设置回调时用到bind, 但同时也会用到占位符号， 一般网上都是直接_1， _2, 但这样一般会报编译错误， C++11提供了std::placeholders::_x..来替代占位符
+
+* 回到问题2上 *
+问题2中的调用是， accept的一个回调函数中调用的， 即acceptor的Event被触发了， 于是调用了acceptor的callback, 这时的callback()传入的参数， 正是建立连接（accept后的fd）
+我提出这个问题主要还是对getsockname这个函数的不太理解， 网上给出的解释是
+```
+getsockname函数返回与套接口关联的本地协议地址。
+getpeername函数返回与套接口关联的远程协议地址。
+```
+
+在不调用bind的TCP客户，当connect成功返回后，getsockname返回分配给此连接的本地IP地址和本地端口号；
+在捆绑了通配IP地址的TCP服务器上，当连接建立后，可以使用getsockname获得分配给此连接的本地IP地址；
+当一个服务器调用exec启动后，他获得客户身份的唯一途径是调用getpeername函数。
+
+简单理解的话， 我觉得应该是当得到一个新的连接fd后， 我们可以通过getsockname(fd, xx, xx)或者与该sockfd绑定的本地结构地址
+
+* 再则回到问题1 *、
+其实正如我的猜测一样， connId 用在了newConnection这个处理新的连接的函数上， 无非就是在servermp的时候创建一个新的id
+但同时有个问题是， 假设一个新conn连上id = 2, 又一个连接id = 3, 这时候2断开了, 如果--3那么再一个新连接的时候重复key了吗》？》？？？
