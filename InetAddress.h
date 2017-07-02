@@ -35,4 +35,6 @@ void setNoBlockAndCloseOnExec(int fd);
 int createSocketFD(bool noblock = false);
 
 struct sockaddr_in getLocalAddr(int sockfd);
+
+int getSocketError(int sockfd);
 #endif

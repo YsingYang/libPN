@@ -44,7 +44,16 @@ struct sockaddr_in getLocalAddr(int sockfd){
         if(::getsockname(sockfd, (struct sockaddr*)&localAddr, &addrLength < 0))
             perror("getLocalAddress error : ");
         return localAddr;
+}
 
+int getSocketError(int sockfd){
+    int optval;
+    socklen_t optlen = sizeof(optval);
+    if(::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen ) < 0)
+        return errno;
+    else{
+        return optval;
+    }
 }
 
 //返回string格式的ip, 注意这里用了引用传参

@@ -25,9 +25,10 @@ public:
 
     void handleFunc(); //处理相应event
 
-    inline void setReadCallback(CallbackFunctor ); //设置相应的 callback函数
-    inline void setWriteCallback(CallbackFunctor ); ///想在后期增加一个接受右值引用的函数
-    inline void setErrorCallback(CallbackFunctor );
+    inline void setReadCallback(const CallbackFunctor&); //设置相应的 callback函数
+    inline void setWriteCallback(const CallbackFunctor&); ///想在后期增加一个接受右值引用的函数
+    inline void setErrorCallback(const CallbackFunctor&);
+    inline void setCloseCallback(const CallbackFunctor&);
 
     inline uint32_t getEvent() const; //对event事件的访问与修改
     inline void setRevent(uint32_t );
@@ -63,25 +64,31 @@ private:
     uint32_t event_;
     uint32_t revent_;
 
+    bool eventHandling_;
     CallbackFunctor readCallback_;
     CallbackFunctor writeCallback_;
     CallbackFunctor errorCallback_;
+    CallbackFunctor closeCallback_;
 };
 
 int PNEvent::getEventFD() const{
     return eventFD_;
 }
 
-void PNEvent::setReadCallback(CallbackFunctor func){
+void PNEvent::setReadCallback(const CallbackFunctor &func){
     readCallback_ = func;
 }
 
-void PNEvent::setWriteCallback(CallbackFunctor func){
+void PNEvent::setWriteCallback(const CallbackFunctor &func){
     writeCallback_ = func;
 }
 
-void PNEvent::setErrorCallback(CallbackFunctor func){
+void PNEvent::setErrorCallback(const CallbackFunctor &func){
     errorCallback_ = func;
+}
+
+void PNEvent::setCloseCallback(const CallbackFunctor &func){
+    closeCallback_ = func;
 }
 
 uint32_t PNEvent::getEvent() const{

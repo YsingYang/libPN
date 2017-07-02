@@ -21,6 +21,7 @@ public:
 
 private:
     void newConnection(int sockfd, const InetAddress& peerAddr);
+    void removeConnection(const TCPConnectionPtr& conn);
 
     typedef std::map<std::string, TCPConnectionPtr> ConnectionMap;
 

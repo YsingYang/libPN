@@ -35,6 +35,14 @@ void PNTCPServer::newConnection(int sockfd, const InetAddress& peerAddr){
     connectedRecord_[connName] = conn;
     conn->setConnectionCallback(connctionCallback_);
     conn->setMessageCallback(messageCallback_);
+    conn->setCloseCallback(std::bind(&PNTCPServer::removeConnection, this, std::placeholders::_1));
     conn->connectEstablished();
+}
+
+void PNTCPServer::removeConnection(const TCPConnectionPtr& conn){
+    loop_->assertInLoopThread();
+    size_t n  = connectedRecord_.erase(conn->getName()); //the function returns the number of elements erased. 我似乎现在才知道erase的返回值是删除个数...
+    assert(n == 1);
+    loop_->queueInLoop(std::bind(&PNTCPConnection::connectDestroyed, conn));
 }
 //这个fd到底是哪个fd

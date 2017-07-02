@@ -1,6 +1,7 @@
 #include "PNEvent.h"
 
 #include "PNEventLoop.h"
+#include <assert.h>
 //定义PNEvent中几个常量变量
 
 const uint32_t PNEvent::NoneEventFlag = 0;
@@ -9,18 +10,25 @@ const uint32_t PNEvent::writeEventFlag = EPOLLOUT;
 const uint32_t PNEvent::errorEventFlag = EPOLLERR;
 
 //constructor
-PNEvent::PNEvent(PNEventLoop* loop, int fd) :eventLoop_(loop), eventFD_(fd), addinLoop(false), event_(0), revent_(0){
+PNEvent::PNEvent(PNEventLoop* loop, int fd) :eventLoop_(loop), eventFD_(fd), addinLoop(false), event_(0), revent_(0), eventHandling_(false){
 
 }
 
 PNEvent::~PNEvent(){
     //::close(eventFD_);//Event对象析构时, 注意移除掉fd
+    assert(!eventHandling_); //断言析构时， 事件并不在处理过程中
 }
 
 void PNEvent::handleFunc(){ //处理当前事件, 调用注册的回调函数
+    eventHandling_  = true;
     if(revent_ & (EPOLLERR)){
         if(errorCallback_)
             errorCallback_(); //如果有, 调用回调
+    }
+
+    if((revent_ & EPOLLHUP) && !(revent_ &   EPOLLIN)){
+        if(closeCallback_)
+            closeCallback_();
     }
 
     if(revent_ & (EPOLLIN | EPOLLPRI | EPOLLHUP)){
@@ -32,6 +40,7 @@ void PNEvent::handleFunc(){ //处理当前事件, 调用注册的回调函数
         if(writeCallback_)
             writeCallback_();
     }
+    eventHandling_ = false;
 }
 
 

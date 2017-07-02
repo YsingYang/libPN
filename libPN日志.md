@@ -368,4 +368,25 @@ getpeername函数返回与套接口关联的远程协议地址。
 
 * 再则回到问题1 *、
 其实正如我的猜测一样， connId 用在了newConnection这个处理新的连接的函数上， 无非就是在servermp的时候创建一个新的id
-但同时有个问题是， 假设一个新conn连上id = 2, 又一个连接id = 3, 这时候2断开了, 如果--3那么再一个新连接的时候重复key了吗》？》？？？
+但同时有个问题是， 假设一个新conn连上id = 2, 又一个连接id = 3, 这时候2断开了, 如果--3那么再一个新连接的时候重复key了吗》??
+
+
+### Date-20 2017. 7. 2
+在之前的TCPServer, TCPConnection完成， 是没有断开连接这一操作， 所以如果有连接进来， 而后断开， 在Server上会一直在死循环的状态.
+1. 在event处理close时， 判断的条件是
+```
+(revent_ & POLLHUP) && !(revent_ &   POLLIN)
+```
+与我之前写PassingNote时候有点不太一样 我之前判断的好像是revent == POLLIN, 然后read == 0 是close..
+网上对POLLHUP描述是这样的
+**POLLHUP, on the other hand, indicates that your file descriptor is valid, but that it's in a state where:**
+> A device has been disconnected, or a pipe or FIFO has been closed by the last process that had it open for writing. Once set, the hangup state of a FIFO shall persist until some process opens the FIFO for writing or until all read-only file descriptors for the FIFO are closed. This event and POLLOUT are mutually-exclusive; a stream can never be writable if a hangup has occurred. However, this event and POLLIN, POLLRDNORM, POLLRDBAND, or POLLPRI are not mutually-exclusive. This flag is only valid in the revents bitmask; it shall be ignored in the events member.
+
+ **POSIX中的描述**
+The device has been disconnected. This event and POLLOUT are mutually-exclusive; a stream can never be writable if a hangup has occurred. However, this event and POLLIN, POLLRDNORM, POLLRDBAND, or POLLPRI are not mutually-exclusive. This flag is only valid in the revents bitmask; it shall be ignored in the events member.
+
+2. 在TCPConnection中， 有个connectDestroyed函数， 是Connection用于主动断开连接的吗？ 不是， 这是connection存货前最后一个函数， 可以理解为处理后事
+
+3. 在buff读取的时候， 出现了相应的错误， 不知道为什么会读取到之前的大小的字符串
+
+
