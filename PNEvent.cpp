@@ -19,7 +19,7 @@ PNEvent::~PNEvent(){
     assert(!eventHandling_); //断言析构时， 事件并不在处理过程中
 }
 
-void PNEvent::handleFunc(){ //处理当前事件, 调用注册的回调函数
+void PNEvent::handleFunc(PNTimestamp time){ //处理当前事件, 调用注册的回调函数
     eventHandling_  = true;
     if(revent_ & (EPOLLERR)){
         if(errorCallback_)
@@ -33,7 +33,7 @@ void PNEvent::handleFunc(){ //处理当前事件, 调用注册的回调函数
 
     if(revent_ & (EPOLLIN | EPOLLPRI | EPOLLHUP)){
         if(readCallback_)
-            readCallback_();
+            readCallback_(time);
     }
 
     if(revent_ & (EPOLLOUT)){

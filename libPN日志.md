@@ -389,4 +389,12 @@ The device has been disconnected. This event and POLLOUT are mutually-exclusive;
 
 3. 在buff读取的时候， 出现了相应的错误， 不知道为什么会读取到之前的大小的字符串
 
+### Date-21 2017. 7. 3
+明天就要上班了！， 好怂啊..
 
+1. 对function MessageCallback的修改， 现在的MessageCallback该为
+```
+typedef boost::function<void (const TcpConnectionPtr&, Buffer* buf, Timestamp)> MessageCallback;
+```
+
+##下次内容， 添加inputbuffer成员进 connection类中

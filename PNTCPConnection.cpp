@@ -9,7 +9,7 @@
 PNTCPConnection::PNTCPConnection(PNEventLoop* loop, const std::string& name, int sockfd, const InetAddress& localAddr, const InetAddress& peerAddr):
     loop_(loop), name_(name), state_(kConnecting),  socket_(new PNSocketStruct(sockfd)), event_(new PNEvent(loop, sockfd)), localAddr_(localAddr), peerAddr_(peerAddr){
         std::cout<<"TcpConnection::ctor [" << name_ <<" ] and fd : [" <<sockfd<<" ] "<<std::endl;
-        event_->setReadCallback(std::bind(&PNTCPConnection::handleRead, this)); //事件触发时， 回调handleRead
+        event_->setReadCallback(std::bind(&PNTCPConnection::handleRead, this, std::placeholders::_1)); //事件触发时， 回调handleRead
         event_->setWriteCallback(std::bind(&PNTCPConnection::handleWrite, this));
         event_->setCloseCallback(std::bind(&PNTCPConnection::handleClose, this));
         event_->setErrorCallback(std::bind(&PNTCPConnection::handleError, this));
@@ -37,7 +37,7 @@ void PNTCPConnection::connectDestroyed(){ //最后 Connection生命的最后一�
     loop_->removeEvent(event_.get());
 }
 
-void PNTCPConnection::handleRead(){
+void PNTCPConnection::handleRead(PNTimestamp recviveTimestamp){
     char buf[65535];
     bzero(buf, 65535);
     ssize_t n = ::read(event_->getEventFD(), buf, 65535);

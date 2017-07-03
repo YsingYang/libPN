@@ -31,6 +31,7 @@ public:
     ~PNEventLoop();
 
     void loop();
+    inline PNTimestamp getEpollReturnTime() const;
 
     void addEvent(PNEvent*);
     void updateEvent(PNEvent* );
@@ -81,6 +82,10 @@ private:
     std::mutex mtx_; //muduo 中这里定义成了mutable
     std::vector<std::function<void()>> pendingFunctors_; //待处理回调, 需要用mutex_保证线程安全
 };
+
+PNTimestamp PNEventLoop::getEpollReturnTime() const{
+        return epollReturnTime_;
+}
 
 bool PNEventLoop::isInLoopThread() const{
     return thisThreadID_ == std::this_thread::get_id();

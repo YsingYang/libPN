@@ -17,10 +17,11 @@ PNEpoll::~PNEpoll(){
     ::close(epollFD_);//关闭fd;
 }
 
-void PNEpoll::poll(std::vector<PNEvent* > &activeEventsList){
+PNTimestamp PNEpoll::poll(int timeoutMs, std::vector<PNEvent* > &activeEventsList){
     //poll前不需要对eventList进行memset?
 
-    int activeNum = epoll_wait(epollFD_, &eventList_[0], static_cast<int>(eventList_.size()), -1);///最后的 timestamp之后再加上
+    int activeNum = epoll_wait(epollFD_, &eventList_[0], static_cast<int>(eventList_.size()), timeoutMs);///最后的 timestamp之后再加上
+    PNTimestamp now(PNTimestamp::now());
     if(activeNum < 0 && errno != EINTR){
         perror("epoll_wait get error : " );
         exit(0);
@@ -34,6 +35,7 @@ void PNEpoll::poll(std::vector<PNEvent* > &activeEventsList){
             eventList_.resize(activeNum * 2);//当监听事件总量到达vector上限时, 类似vector一样扩展上限
         }
     }
+    return now;
 }
 
 void PNEpoll::fillActivEventsList(int numsActiveEvents, std::vector<PNEvent*>& activeEventList){

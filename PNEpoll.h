@@ -15,7 +15,7 @@ public:
     PNEpoll(PNEventLoop* );
     ~PNEpoll();
 
-    void poll(std::vector<PNEvent*> &activeEventList);
+    PNTimestamp poll(int timeoutMs, std::vector<PNEvent*> &activeEventList);
 
     void addEvent(PNEvent* event);//添加event;
     void  removeEvent(PNEvent* event);

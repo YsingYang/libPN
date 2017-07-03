@@ -37,6 +37,8 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="Buffer.cpp" />
+		<Unit filename="Buffer.h" />
 		<Unit filename="InetAddress.cpp" />
 		<Unit filename="InetAddress.h" />
 		<Unit filename="PNAcceptor.cpp" />
@@ -63,7 +65,7 @@
 		<Unit filename="PNTimerQueue.cpp" />
 		<Unit filename="PNTimerQueue.h" />
 		<Unit filename="PNtype.h" />
-		<Unit filename="Tester/test08.cpp" />
+		<Unit filename="Tester/test03.cpp" />
 		<Unit filename="callbackType.h" />
 		<Extensions>
 			<code_completion />

@@ -42,7 +42,7 @@ private:
     void setState(State s){
         state_ = s;
     }
-    void handleRead();
+    void handleRead(PNTimestamp recviveTimestamp);
     void handleWrite();
     void handleError();
     void handleClose();

@@ -9,6 +9,7 @@
 
 int PNEventLoop::activeEventLength = 16;
 __thread PNEventLoop* loopInThisThread = nullptr;
+const int kEpollTImeMs = 10000;
 
 static int createEventFd(){
     int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
@@ -60,9 +61,9 @@ void PNEventLoop::loop(){ //主要执行函数
 
     while(!quit_){
         activeEventList_.clear();
-        epoller_->poll(activeEventList_);
+        epollReturnTime_ = epoller_->poll(kEpollTImeMs, activeEventList_);
         for(auto &it : activeEventList_){ ///这里是用右值引用还是左值引用来着?
-            it->handleFunc();
+            it->handleFunc(epollReturnTime_);
         }
         doPendingFunctors();//执行相应回调
     }

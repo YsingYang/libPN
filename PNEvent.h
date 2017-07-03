@@ -6,6 +6,7 @@
 #include <boost/noncopyable.hpp>
 
 class PNEventLoop;//前置声明
+class PNTimestamp;
 /*******************************************************
 
 每个Channel自始自终只服务于一个FD,  同时也只属于一个eventloop
@@ -16,6 +17,7 @@ class PNEvent : boost::noncopyable{
 public:
 
     typedef std::function<void()> CallbackFunctor;
+    typedef std::function<void(PNTimestamp)> ReadEventCallback;
 
 
     PNEvent(PNEventLoop*, int ); //创建 Event时需要提供两个参数, 一个为属于的Eventloop, 另一个为fd,
@@ -23,9 +25,9 @@ public:
 
     inline int getEventFD() const; //提供对fd访问接口
 
-    void handleFunc(); //处理相应event
+    void handleFunc(PNTimestamp time); //处理相应event
 
-    inline void setReadCallback(const CallbackFunctor&); //设置相应的 callback函数
+    inline void setReadCallback(const ReadEventCallback&); //设置相应的 callback函数
     inline void setWriteCallback(const CallbackFunctor&); ///想在后期增加一个接受右值引用的函数
     inline void setErrorCallback(const CallbackFunctor&);
     inline void setCloseCallback(const CallbackFunctor&);
@@ -65,7 +67,7 @@ private:
     uint32_t revent_;
 
     bool eventHandling_;
-    CallbackFunctor readCallback_;
+    ReadEventCallback readCallback_;
     CallbackFunctor writeCallback_;
     CallbackFunctor errorCallback_;
     CallbackFunctor closeCallback_;
@@ -75,7 +77,7 @@ int PNEvent::getEventFD() const{
     return eventFD_;
 }
 
-void PNEvent::setReadCallback(const CallbackFunctor &func){
+void PNEvent::setReadCallback(const ReadEventCallback &func){
     readCallback_ = func;
 }
 
