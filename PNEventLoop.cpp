@@ -61,7 +61,7 @@ void PNEventLoop::loop(){ //主要执行函数
 
     while(!quit_){
         activeEventList_.clear();
-        epollReturnTime_ = epoller_->poll(kEpollTImeMs, activeEventList_);
+        epollReturnTime_ = epoller_->poll(kEpollTImeMs, activeEventList_); ///返回一个返回时间
         for(auto &it : activeEventList_){ ///这里是用右值引用还是左值引用来着?
             it->handleFunc(epollReturnTime_);
         }

@@ -6,6 +6,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include "callbackType.h"
 #include "InetAddress.h"
+#include "Buffer.h"
 #include <memory>
 #include <atomic>
 
@@ -58,6 +59,7 @@ private:
     ConnectionCallback connectCallback_;
     MessageCallback messageCallback_;
     CloseCallback closeCallback_; //用于析构时给TCPServer的mp去除掉相应的Connection
+    Buffer inputBuffer_; //添加read需要使用到的Buffer类
 };
 
 PNEventLoop* PNTCPConnection::getLoop() const{

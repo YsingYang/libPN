@@ -385,7 +385,7 @@ getpeername函数返回与套接口关联的远程协议地址。
  **POSIX中的描述**
 The device has been disconnected. This event and POLLOUT are mutually-exclusive; a stream can never be writable if a hangup has occurred. However, this event and POLLIN, POLLRDNORM, POLLRDBAND, or POLLPRI are not mutually-exclusive. This flag is only valid in the revents bitmask; it shall be ignored in the events member.
 
-2. 在TCPConnection中， 有个connectDestroyed函数， 是Connection用于主动断开连接的吗？ 不是， 这是connection存货前最后一个函数， 可以理解为处理后事
+2. 在TCPConnection中， 有个connectDestroyed函数， 是Connection用于主动断开连接的吗？ 不是， 这是connection存活前最后一个函数， 可以理解为处理后事
 
 3. 在buff读取的时候， 出现了相应的错误， 不知道为什么会读取到之前的大小的字符串
 
@@ -398,3 +398,18 @@ typedef boost::function<void (const TcpConnectionPtr&, Buffer* buf, Timestamp)> 
 ```
 
 ##下次内容， 添加inputbuffer成员进 connection类中
+
+### Date-21 2017. 9. 4
+复习一下之前的内容..都不记得自己写了啥..
+####TCPAcceptor
+用于处理新连接, 需要定义一个handleread的回调函数进行相应的fd处理, 存在于TCPServer内部
+####TCPServer
+主要处理维护内部的TCP连接, 并设置构造时内部的TCPAcceptor创建相应的TCPConnection回调, 同时还需维护一个TCP连接的哈希表(TCPConnection)
+
+### Date-22 2017. 9. 5
+从头查了一下, 主要是因为在`Buffer Class`添加进来之后, 需要将相应read的函数参数改变.首先还是先增加Buffer Class吧
+这里Buffer类还封装了相应的readFD的做法, 但是没理解他说到之中优化到的地方
+首先`scaater/gatherIO`通常指的是readv, writev, 在stackoverflow上描述其操作一般是原子性的, 一次性可以读取全部数据
+其次的第二个好处是只调用了一次read, 这样调用的好处不会反复调用read, 知道EAGAIN
+**估计上述说到的好处都是与`readv, writev`这两者与`read, write`的对比**
+具体参考[scaater/gatherIO](https://stackoverflow.com/questions/10520182/linux-when-to-use-scatter-gather-io-readv-writev-vs-a-large-buffer-with-frea)

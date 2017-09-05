@@ -38,11 +38,16 @@ void PNTCPConnection::connectDestroyed(){ //最后 Connection生命的最后一�
 }
 
 void PNTCPConnection::handleRead(PNTimestamp recviveTimestamp){
+    int saveErrorNo = 0;
+    ssize_t n = inputBuffer_.readFd(event_->getEventFD(), &saveErrorNo); ///读取fd中相应的数据
+    /*
     char buf[65535];
     bzero(buf, 65535);
     ssize_t n = ::read(event_->getEventFD(), buf, 65535);
+    未使用Buffer类, 一次性读取所有
+    */
     if(n > 0){
-       messageCallback_(shared_from_this(), buf, n);
+       messageCallback_(shared_from_this(), &inputBuffer_, recviveTimestamp);
     }
     else if(n == 0){
         handleClose();
